@@ -18,7 +18,7 @@
     body {
       font-family: 'Urbanist', sans-serif;
       background-color: #f8f9fa;
-      padding-top: 70px; /* Space for fixed navbar */
+      padding-top: 70px;
     }
     .navbar {
       position: fixed;
@@ -75,6 +75,12 @@
       color: #0d6efd;
       text-decoration: underline;
     }
+    .table-responsive {
+      overflow-x: auto;
+    }
+    table {
+      min-width: 600px;
+    }
   </style>
 </head>
 <body>
@@ -125,42 +131,44 @@
 
     <div class="card p-4">
       <h5 class="mb-3">🧾 Sale Summary</h5>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Qty</th>
-            <th>Unit Price</th>
-            <th>Subtotal</th>
-            <th>Profit</th>
-            <th>Time</th>
-            <th>Receipt</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for sale in sales %}
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
             <tr>
-              <td>{{ sale.product.name }}</td>
-              <td>{{ sale.quantity }}</td>
-              <td>UGX {{ "%.2f"|format(sale.price_sold) }}</td>
-              <td>UGX {{ "%.2f"|format(sale.quantity * sale.price_sold) }}</td>
-              <td>
-                UGX {{
-                  "%.2f"|format((sale.price_sold - sale.product.cost_price) * sale.quantity)
-                }}
-              </td>
-              <td>{{ sale.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
-              <td><a href="/sales/receipt/{{ sale.id }}" class="receipt-link">View</a></td>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Unit Price</th>
+              <th>Subtotal</th>
+              <th>Profit</th>
+              <th>Time</th>
+              <th>Receipt</th>
             </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="6" class="text-end">Total Earned:</td>
-            <td class="total-box">UGX {{ "%.2f"|format(total_earned) }}</td>
-          </tr>
-        </tfoot>
-      </table>
+          </thead>
+          <tbody>
+            {% for sale in sales %}
+              <tr>
+                <td>{{ sale.product.name }}</td>
+                <td>{{ sale.quantity }}</td>
+                <td>UGX {{ "%.2f"|format(sale.price_sold) }}</td>
+                <td>UGX {{ "%.2f"|format(sale.quantity * sale.price_sold) }}</td>
+                <td>
+                  UGX {{
+                    "%.2f"|format((sale.price_sold - sale.product.cost_price) * sale.quantity)
+                  }}
+                </td>
+                <td>{{ sale.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td><a href="/sales/receipt/{{ sale.id }}" class="receipt-link">View</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="6" class="text-end">Total Earned:</td>
+              <td class="total-box">UGX {{ "%.2f"|format(total_earned) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   </div>
 
