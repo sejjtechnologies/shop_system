@@ -25,12 +25,12 @@
       top: 0;
       left: 0;
       right: 0;
-      background: linear-gradient(135deg, #0d6efd, #6f42c1);
+      background: linear-gradient(135deg, #198754, #28a745);
       padding: 10px 20px;
       z-index: 1000;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       color: white;
     }
     .navbar h4 {
@@ -38,12 +38,17 @@
       font-weight: 600;
       font-size: 1.2rem;
     }
+    .right-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
     .exit-btn {
       font-size: 0.95rem;
       font-weight: 500;
       color: white;
       text-decoration: none;
-      margin-left: 15px;
     }
     .exit-btn i {
       margin-right: 5px;
@@ -86,7 +91,7 @@
 
   <div class="navbar">
     <h4>🛒 Sales Clerk Dashboard</h4>
-    <div class="d-flex align-items-center">
+    <div class="right-section">
       <div class="balance-card">
         💰 UGX {{ "%.2f"|format(total_income) }}
       </div>
