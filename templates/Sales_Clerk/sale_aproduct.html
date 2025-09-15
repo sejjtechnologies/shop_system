@@ -37,6 +37,13 @@
       margin: 0;
       font-weight: 600;
       font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .navbar h4 .icon-glow {
+      color: #00ffff;
+      text-shadow: 0 0 6px #00ffff;
     }
     .right-section {
       display: flex;
@@ -91,7 +98,7 @@
 <body>
 
   <div class="navbar">
-    <h4>🛒 Sales Clerk Dashboard</h4>
+    <h4><span class="icon-glow">🛒</span> Sales Clerk Dashboard</h4>
     <div class="right-section">
       <div class="balance-card">
         💰 UGX {{ "%.2f"|format(total_income) }}
