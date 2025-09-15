@@ -264,7 +264,6 @@ def update_products():
             if image_file and image_file.filename:
                 filename = secure_filename(image_file.filename)
 
-                # Delete old image if present
                 if product.image_path:
                     old_path = os.path.join(upload_folder, product.image_path)
                     if os.path.exists(old_path):
@@ -298,24 +297,19 @@ def delete_product(product_id):
 
 @admin_routes.route('/admin/define-permissions', methods=['GET', 'POST'])
 def define_permissions():
-    # Fetch distinct roles from users table
     roles_query = db.session.query(User.role).distinct().all()
-    roles = [r[0] for r in roles_query if r[0]]  # Flatten and filter out None
+    roles = [r[0] for r in roles_query if r[0]]
 
     selected_role = request.form.get('role') if request.method == 'POST' else (roles[0] if roles else None)
 
     if not selected_role:
         flash("No roles found in the system.", "warning")
-        return render_template('admin/define_permissions.html', roles=[], selected_role=None, permissions=[])
+        return render_template('Admin/define_permissions.html', roles=[], selected_role=None, permissions=[])
 
-    # Fetch all permissions
     all_permissions = Permission.query.all()
-
-    # Fetch current role permissions
     role_perms = RolePermission.query.filter_by(role=selected_role).all()
     allowed_codes = {rp.permission_code for rp in role_perms if rp.is_allowed}
 
-    # On POST: update permissions
     if request.method == 'POST':
         for perm in all_permissions:
             code = perm.code
@@ -330,14 +324,16 @@ def define_permissions():
         flash(f"Permissions updated for role: {selected_role}", "success")
         return redirect(url_for('admin_routes.define_permissions'))
 
-    # Annotate permissions with current status
     for perm in all_permissions:
         perm.is_allowed = perm.code in allowed_codes
 
-    return render_template('admin/define_permissions.html',
-                           roles=roles,
-                           selected_role=selected_role,
-                           permissions=all_permissions)
+    return render_template(
+        'Admin/define_permissions.html',
+        roles=roles,
+        selected_role=selected_role,
+        permissions=all_permissions
+    )
+
 @admin_routes.route('/admin/system-settings', methods=['GET', 'POST'])
 def system_settings():
     if session.get('role') != 'admin':
@@ -345,7 +341,6 @@ def system_settings():
 
     from core.models import SystemSetting
 
-    # Fetch the single settings row (create if missing)
     settings = SystemSetting.query.first()
     if not settings:
         settings = SystemSetting()
@@ -365,7 +360,6 @@ def system_settings():
         settings.enable_csv_export = 'enable_csv_export' in request.form
         settings.backup_frequency = request.form.get('backup_frequency')
 
-        # Handle logo upload via form
         if 'logo' in request.files:
             logo_file = request.files['logo']
             if logo_file and logo_file.filename:
@@ -380,5 +374,4 @@ def system_settings():
         flash("System settings updated successfully.", "success")
         return redirect(url_for('admin_routes.system_settings'))
 
-    return render_template('admin/system_settings.html', settings=settings)
-
+    return render_template('Admin/system_settings.html', settings=settings)
