@@ -25,26 +25,23 @@
     .navbar-brand {
       font-size: 1.25rem;
     }
-    .balance-circle {
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
+    .balance-card {
+      max-width: 320px;
+      margin: auto;
+      padding: 1.5rem;
+      border-radius: 1rem;
       background: linear-gradient(135deg, #0d6efd, #6610f2);
       color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin: auto;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      text-align: center;
     }
-    .balance-circle h4 {
-      margin: 0;
-      font-size: 1rem;
+    .balance-card h4 {
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
       font-weight: 500;
     }
-    .balance-circle .amount {
-      font-size: 1.5rem;
+    .balance-card .amount {
+      font-size: 1.8rem;
       font-weight: bold;
     }
     .card-body {
@@ -98,7 +95,7 @@
   <div class="container mt-4">
     <!-- Balance Display -->
     <div class="text-center mb-5">
-      <div class="balance-circle">
+      <div class="balance-card">
         <h4>Total Balance</h4>
         <div class="amount">UGX {{ "%.2f"|format(total_income) }}</div>
       </div>
