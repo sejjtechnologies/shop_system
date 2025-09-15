@@ -1,0 +1,9 @@
+flask
+flask-bcrypt
+flask_sqlalchemy
+flask_migrate
+python-dotenv
+pytz
+flask_login
+flask_wtf
+wtforms
