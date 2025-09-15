@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>System Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .form-section {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+    .logo-preview {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-dark bg-dark px-4">
+    <a href="/admin/dashboard" class="btn btn-outline-light">
+      <i class="bi bi-door-open me-1"></i> Exit
+    </a>
+    <span class="navbar-text text-white fs-5">
+      <i class="bi bi-gear me-2"></i> System Settings
+    </span>
+  </nav>
+
+  <div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/admin/system-settings" enctype="multipart/form-data">
+      <div class="form-section mb-4">
+        <div class="section-title">System Identity</div>
+        <div class="mb-3 text-center">
+          {% if settings.logo_filename %}
+            <img src="{{ url_for('static', filename='logo/' ~ settings.logo_filename) }}" alt="Logo" class="logo-preview">
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label">System Name</label>
+          <input type="text" name="system_name" class="form-control" value="{{ settings.system_name }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Organization Name</label>
+          <input type="text" name="organization_name" class="form-control" value="{{ settings.organization_name }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Logo Upload</label>
+          <input type="file" name="logo" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Contact Email</label>
+          <input type="email" name="contact_email" class="form-control" value="{{ settings.contact_email }}">
+        </div>
+      </div>
+
+      <div class="form-section mb-4">
+        <div class="section-title">Localization</div>
+        <div class="mb-3">
+          <label class="form-label">Default Currency</label>
+          <select name="currency" class="form-select">
+            <option value="UGX" {% if settings.currency == 'UGX' %}selected{% endif %}>UGX</option>
+            <option value="USD" {% if settings.currency == 'USD' %}selected{% endif %}>USD</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Timezone</label>
+          <input type="text" name="timezone" class="form-control" value="{{ settings.timezone }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Date Format</label>
+          <select name="date_format" class="form-select">
+            <option value="DD/MM/YYYY" {% if settings.date_format == 'DD/MM/YYYY' %}selected{% endif %}>DD/MM/YYYY</option>
+            <option value="YYYY-MM-DD" {% if settings.date_format == 'YYYY-MM-DD' %}selected{% endif %}>YYYY-MM-DD</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section mb-4">
+        <div class="section-title">System Behavior</div>
+        <div class="mb-3">
+          <label class="form-label">Session Timeout (minutes)</label>
+          <input type="number" name="session_timeout" class="form-control" value="{{ settings.session_timeout }}">
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="maintenance_mode" id="maintenance_mode" {% if settings.maintenance_mode %}checked{% endif %}>
+          <label class="form-check-label" for="maintenance_mode">
+            Enable Maintenance Mode
+          </label>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Maintenance Message</label>
+          <input type="text" name="maintenance_message" class="form-control" value="{{ settings.maintenance_message }}">
+        </div>
+      </div>
+
+      <div class="form-section mb-4">
+        <div class="section-title">Backup & Export</div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="enable_csv_export" id="enable_csv_export" {% if settings.enable_csv_export %}checked{% endif %}>
+          <label class="form-check-label" for="enable_csv_export">
+            Enable CSV Export
+          </label>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Auto-Backup Frequency</label>
+          <select name="backup_frequency" class="form-select">
+            <option value="daily" {% if settings.backup_frequency == 'daily' %}selected{% endif %}>Daily</option>
+            <option value="weekly" {% if settings.backup_frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="text-end mb-5">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-save me-1"></i> Save Settings
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

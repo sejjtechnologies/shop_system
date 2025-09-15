@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Users</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      padding-top: 70px;
+    }
+    .table-wrapper {
+      max-width: 900px;
+      margin: auto;
+    }
+    .table th, .table td {
+      font-size: 0.875rem;
+      vertical-align: middle;
+    }
+    .action-buttons i {
+      font-size: 1rem;
+      margin-right: 8px;
+      cursor: pointer;
+      color: #495057;
+    }
+    .action-buttons i:hover {
+      color: #0d6efd;
+    }
+    input[type="text"], input[type="email"], select {
+      width: 100%;
+      font-size: 0.875rem;
+    }
+    input[type="file"] {
+      font-size: 0.75rem;
+    }
+    .profile-thumb {
+      max-height: 40px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Fixed Top Navbar -->
+  <nav class="navbar navbar-dark bg-dark fixed-top px-3 d-flex justify-content-between">
+    <a href="/admin/dashboard" class="btn btn-outline-light">
+      <i class="bi bi-door-open me-1"></i> Back
+    </a>
+    <span class="navbar-text text-white">
+      <i class="bi bi-people me-2"></i>Registered Users
+    </span>
+  </nav>
+
+  <div class="container mt-4 table-wrapper">
+    <table class="table table-sm table-bordered table-hover table-striped align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Profile Image</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr data-user-id="{{ user.id }}">
+          <td>{{ loop.index }}</td>
+
+          <!-- Profile Image -->
+          <td>
+            <span class="view-mode">
+              {% if user.profile_image %}
+                <img src="{{ url_for('static', filename='uploads/' ~ user.profile_image) }}" alt="Profile" class="profile-thumb">
+              {% else %}
+                —
+              {% endif %}
+            </span>
+            <input type="file" class="form-control edit-mode d-none" name="profile_image">
+          </td>
+
+          <!-- Username -->
+          <td>
+            <span class="view-mode">{{ user.username }}</span>
+            <input type="text" class="form-control edit-mode d-none" name="username" value="{{ user.username }}">
+          </td>
+
+          <!-- Email -->
+          <td>
+            <span class="view-mode">{{ user.email }}</span>
+            <input type="email" class="form-control edit-mode d-none" name="email" value="{{ user.email }}">
+          </td>
+
+          <!-- Role -->
+          <td>
+            <span class="view-mode">{{ user.role }}</span>
+            <select class="form-select edit-mode d-none" name="role">
+              <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+              <option value="sales_clerk" {% if user.role == 'sales_clerk' %}selected{% endif %}>Sales Clerk</option>
+            </select>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <span class="view-mode">{{ 'Active' if user.is_active else 'Inactive' }}</span>
+            <select class="form-select edit-mode d-none" name="is_active">
+              <option value="true" {% if user.is_active %}selected{% endif %}>Active</option>
+              <option value="false" {% if not user.is_active %}selected{% endif %}>Inactive</option>
+            </select>
+          </td>
+
+          <!-- Created At -->
+          <td>{{ user.created_at.strftime('%a, %d/%m/%Y %I:%M %p') }}</td>
+
+          <!-- Actions -->
+          <td class="action-buttons">
+            <i class="bi bi-pencil-square edit-btn" title="Edit"></i>
+            <i class="bi bi-trash delete-btn" title="Delete"></i>
+            <i class="bi bi-check-lg save-btn text-success d-none" title="Save"></i>
+            <a href="/admin/reset-user-password/{{ user.id }}" title="More">
+              <i class="bi bi-three-dots"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const row = btn.closest('tr');
+        row.classList.add('editing');
+        row.querySelectorAll('.view-mode').forEach(el => el.classList.add('d-none'));
+        row.querySelectorAll('.edit-mode').forEach(el => el.classList.remove('d-none'));
+
+        const saveBtn = row.querySelector('.save-btn');
+        saveBtn.classList.add('d-none');
+
+        const originalValues = {};
+        row.querySelectorAll('.edit-mode').forEach(input => {
+          if (input.name && input.type !== 'file') {
+            originalValues[input.name] = input.value;
+            input.addEventListener('input', () => {
+              if (input.value !== originalValues[input.name]) {
+                saveBtn.classList.remove('d-none');
+              }
+            });
+          }
+          if (input.type === 'file') {
+            input.addEventListener('change', () => {
+              if (input.files.length > 0) {
+                saveBtn.classList.remove('d-none');
+              }
+            });
+          }
+        });
+      });
+    });
+
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const row = btn.closest('tr');
+        const userId = row.getAttribute('data-user-id');
+        fetch(`/admin/delete-user/${userId}`, {
+          method: 'POST'
+        }).then(res => res.json()).then(data => {
+          if (data.message) row.remove();
+        });
+      });
+    });
+
+    document.querySelectorAll('.save-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const row = btn.closest('tr');
+        const userId = row.getAttribute('data-user-id');
+        const formData = new FormData();
+
+        row.querySelectorAll('.edit-mode').forEach(input => {
+          if (input.name && input.type !== 'file') {
+            formData.append(input.name, input.value);
+          }
+          if (input.type === 'file' && input.files[0]) {
+            formData.append(input.name, input.files[0]);
+          }
+        });
+
+        fetch(`/admin/update-user/${userId}`, {
+          method: 'POST',
+          body: formData
+        }).then(res => res.json()).then(data => {
+          if (data.message) {
+            row.querySelectorAll('.edit-mode').forEach(el => el.classList.add('d-none'));
+            row.querySelectorAll('.view-mode').forEach(el => el.classList.remove('d-none'));
+            btn.classList.add('d-none');
+            row.classList.remove('editing');
+            location.reload();
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
